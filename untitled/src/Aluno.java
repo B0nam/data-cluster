@@ -1,20 +1,27 @@
-import java.math.BigDecimal;
-import java.util.HashMap;
-
 public class Aluno {
 
 //    private HashMap<String, String> atributos;
-
-    private Double idade;
-    private Double falta;
-    private Double mediaNota;
-
-    private Double coeficient;
 //
 //    public HashMap<String, String> getAtributos() {
 //        return atributos;
 //    }
 //
+
+    private String nome;
+    private Double idade;
+    private Double falta;
+    private Double mediaNota;
+    private TipoAluno tipoAluno;
+
+    private Double coeficient;
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
     public Double getIdade() {
         return idade;
@@ -39,9 +46,6 @@ public class Aluno {
     public void setMediaNota(Double mediaNota) {
         this.mediaNota = mediaNota;
     }
-//    public void setAtributos(HashMap<String, String> atributos) {
-//        this.atributos = atributos;
-//    }
 
     public Double getCoeficient() {
         return coeficient;
@@ -51,5 +55,21 @@ public class Aluno {
         this.coeficient = coeficient;
     }
 
+    public TipoAluno getTipoAluno() {
+        return tipoAluno;
+    }
 
+    public void setTipoAluno(TipoAluno tipoAluno) {
+        this.tipoAluno = tipoAluno;
+    }
+
+    @Override
+    public String toString() {
+        return "Aluno{" +
+                "idade=" + idade +
+                ", falta=" + falta +
+                ", mediaNota=" + mediaNota +
+                ", tipoAluno=" + tipoAluno +
+                '}';
+    }
 }

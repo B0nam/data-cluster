@@ -1,15 +1,18 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Cluster {
 
-    private Double valorCentroid;
-    private List<Aluno> alunos;
+    private Aluno valorCentroid = new Aluno();
+    private List<Aluno> alunos = new ArrayList<>();
 
     public void addAluno(Aluno aluno) {
         alunos.add(aluno);
-        this.valorCentroid = alunos.stream().mapToDouble(Aluno::getFalta).sum() / alunos.size()
-                + alunos.stream().mapToDouble(Aluno::getIdade).sum() / alunos.size()
-                + alunos.stream().mapToDouble(Aluno::getMediaNota).sum() / alunos.size();
+
+        valorCentroid.setFalta(alunos.stream().mapToDouble(Aluno::getFalta).sum() / alunos.size());
+        valorCentroid.setIdade(alunos.stream().mapToDouble(Aluno::getIdade).sum() / alunos.size());
+        valorCentroid.setTipoAluno(TipoAluno.fromValor((int) alunos.stream().mapToDouble(a -> a.getTipoAluno().getValor()).sum() / alunos.size()));
+        valorCentroid.setMediaNota(alunos.stream().mapToDouble(Aluno::getMediaNota).sum() / alunos.size());
     }
 
     public void removeAluno(Aluno aluno) {
@@ -23,11 +26,19 @@ public class Cluster {
         this.alunos = alunos;
     }
 
-    public Double getValorCentroid() {
+    public Aluno getValorCentroid() {
         return valorCentroid;
     }
 
-    public void setValorCentroid(Double valorCentroid) {
+    public void setValorCentroid(Aluno valorCentroid) {
         this.valorCentroid = valorCentroid;
+    }
+
+    @Override
+    public String toString() {
+        return "\nCluster{" +
+                "valorCentroid=" + valorCentroid +
+                ", alunos=" + alunos +
+                "}\n";
     }
 }

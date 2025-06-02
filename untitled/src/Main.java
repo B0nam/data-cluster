@@ -1,83 +1,79 @@
-import com.sun.source.tree.BreakTree;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-//    public static void main(String[] args) {
-//
-//        Cluster clusterA = new Cluster();
-//        Cluster clusterB = new Cluster();
-//
-//        Mediator mediator = new Mediator(List.of(clusterA, clusterB));
-//
-//        Aluno alunoA = new Aluno();
-//        Aluno alunoB = new Aluno();
-//
-//        mediator.addAlunoOnCluster(alunoA);
-//        mediator.addAlunoOnCluster(alunoB);
-//    }
+    public static final Integer LIMIAR = 6;
 
-    public static final Integer LIMIAR = 12;
-
-
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         List<Cluster> clusters = new ArrayList<>();
 
         Aluno alunoA = alunoA();
+        Aluno novoAlunoNovo = novoAlunoNovo();
         Aluno alunoB = alunoB();
         Aluno novoAluno = alunoNovo();
+        Aluno novoAlunoNovoNovo = novoAlunoNovoNovo();
 
-        Aluno novoAlunoNovo = alunoNovo();
-        novoAlunoNovo.setNome("NovoAlunoNovo");
-        novoAlunoNovo.setIdade(30D);
-        novoAlunoNovo.setFalta(0.5);
-        novoAlunoNovo.setFalta(9D);
-        novoAlunoNovo.setTipoAluno(TipoAluno.PRODIGIO);
 
-        Cluster clusterEntrar = validarClusterEntrar(alunoA, clusters);
-        clusterEntrar.addAluno(alunoA);
+        List<Aluno> todosAlunos = new ArrayList<>();
 
-        clusterEntrar = validarClusterEntrar(alunoB, clusters);
-        clusterEntrar.addAluno(alunoB);
+        validarClusterEntrar(alunoA, clusters, todosAlunos);
+        todosAlunos.add(alunoA);
 
-        clusterEntrar = validarClusterEntrar(novoAluno, clusters);
-        clusterEntrar.addAluno(novoAluno);
+        validarClusterEntrar(novoAlunoNovoNovo, clusters, todosAlunos);
+        todosAlunos.add(novoAlunoNovoNovo);
 
-        clusterEntrar = validarClusterEntrar(novoAlunoNovo, clusters);
-        clusterEntrar.addAluno(novoAlunoNovo);
+        validarClusterEntrar(novoAluno, clusters, todosAlunos);
+        todosAlunos.add(novoAluno);
 
+        validarClusterEntrar(alunoB, clusters, todosAlunos);
+        todosAlunos.add(alunoB);
+
+        validarClusterEntrar(novoAlunoNovo, clusters, todosAlunos);
+        todosAlunos.add(novoAlunoNovo);
 
         System.out.println(clusters);
         System.out.println();
     }
 
 
-    private static Cluster validarClusterEntrar(Aluno novoAluno, List<Cluster> clusters) {
+    private static void validarClusterEntrar(Aluno novoAluno, List<Cluster> clusters, List<Aluno> todosAlunos) {
         Cluster clusterEntrar = new Cluster();
-        Double valorEntrar = (99999999999999D);
+        Double valorEntrar = Double.MAX_VALUE;
         Boolean criarNovoCluster = true;
         for (Cluster cluster : clusters) {
-            Double coeficiente = Math.sqrt(
-                    Math.pow(novoAluno.getFalta() - cluster.getValorCentroid().getFalta(), 2)
-                    + Math.pow(novoAluno.getIdade() - cluster.getValorCentroid().getIdade(), 2)
-                    + Math.pow(novoAluno.getMediaNota() - cluster.getValorCentroid().getMediaNota(), 2)
-                    + Math.pow(novoAluno.getTipoAluno().getValor() - cluster.getValorCentroid().getTipoAluno().getValor(), 2)
-            );
+            Double coeficiente = getCoeficiente(novoAluno, cluster);
 
             if (coeficiente < LIMIAR && valorEntrar > coeficiente) {
                 valorEntrar = coeficiente;
                 clusterEntrar = cluster;
                 criarNovoCluster = false;
             }
-            System.out.println(coeficiente);
         }
 
-        if(criarNovoCluster) {
-            clusters.add(clusterEntrar);
+        if (clusterEntrar.getAlunos().contains(novoAluno)) {
+            return;
         }
-        return clusterEntrar;
+
+        if (criarNovoCluster) {
+            clusters.add(clusterEntrar);
+            clusterEntrar.addAluno(novoAluno);
+            todosAlunos.forEach(aluno -> validarClusterEntrar(aluno, clusters, todosAlunos));
+            return;
+        }
+
+
+        clusterEntrar.addAluno(novoAluno);
+        todosAlunos.forEach(aluno -> validarClusterEntrar(aluno, clusters, todosAlunos));
+    }
+
+    private static double getCoeficiente(Aluno novoAluno, Cluster cluster) {
+        return Math.sqrt(
+                Math.pow(novoAluno.getFalta() - cluster.getValorCentroid().getFalta(), 2)
+                        + Math.pow(novoAluno.getIdade() - cluster.getValorCentroid().getIdade(), 2)
+                        + Math.pow(novoAluno.getMediaNota() - cluster.getValorCentroid().getMediaNota(), 2)
+                        + Math.pow(novoAluno.getTipoAluno().getValor() - cluster.getValorCentroid().getTipoAluno().getValor(), 2)
+        );
     }
 
     private static Aluno alunoA() {
@@ -93,7 +89,7 @@ public class Main {
     private static Aluno alunoB() {
         Aluno aluno = new Aluno();
         aluno.setNome("Pedro");
-        aluno.setIdade(40D);
+        aluno.setIdade(37D);
         aluno.setFalta(0.5);
         aluno.setMediaNota(7.9);
         aluno.setTipoAluno(TipoAluno.ESFORCADO);
@@ -103,10 +99,30 @@ public class Main {
     private static Aluno alunoNovo() {
         Aluno aluno = new Aluno();
         aluno.setNome("Novo");
-        aluno.setIdade(24D);
-        aluno.setFalta(0.0);
+        aluno.setIdade(25D);
+        aluno.setFalta(0.5);
         aluno.setMediaNota(7D);
-        aluno.setTipoAluno(TipoAluno.RELAXADO);
+        aluno.setTipoAluno(TipoAluno.ESFORCADO);
         return aluno;
+    }
+
+    private static Aluno novoAlunoNovo() {
+        Aluno novoAlunoNovo = new Aluno();
+        novoAlunoNovo.setNome("NovoAlunoNovo");
+        novoAlunoNovo.setIdade(30D);
+        novoAlunoNovo.setFalta(0.5);
+        novoAlunoNovo.setMediaNota(9D);
+        novoAlunoNovo.setTipoAluno(TipoAluno.PRODIGIO);
+        return novoAlunoNovo;
+    }
+
+    private static Aluno novoAlunoNovoNovo() {
+        Aluno novoAlunoNovo = new Aluno();
+        novoAlunoNovo.setNome("NovoAlunoNovoNovo");
+        novoAlunoNovo.setIdade(42D);
+        novoAlunoNovo.setFalta(0.5);
+        novoAlunoNovo.setMediaNota(9D);
+        novoAlunoNovo.setTipoAluno(TipoAluno.PRODIGIO);
+        return novoAlunoNovo;
     }
 }
